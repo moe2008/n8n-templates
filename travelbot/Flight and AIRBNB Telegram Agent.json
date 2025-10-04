@@ -1,0 +1,376 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "46dbb389-fc19-49f6-b167-4aa0f1dc8abd",
+      "name": "Telegram Trigger",
+      "webhookId": "",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Du bist ein intelligenter Reise-Assistent mit drei Tools: search_airport, search_flights und search_airbnb.\n\n=== DATUMS-VERARBEITUNG ===\n\nWandle Datumseingaben automatisch um:\n\n- \"im November\" → \"2025-11-01\"\n\n- \"15. November\" → \"2025-11-15\"\n\n- \"für eine Woche\" → returnDate = departDate + 7 Tage\n\n- \"für einen Monat\" → returnDate = departDate + 30 Tage\n\nHeute ist: 2025-10-03\n\nFormat: YYYY-MM-DD\n\n=== INTELLIGENTE PREIS-BERECHNUNG ===\n\nWICHTIG: priceMax ist der GESAMTPREIS für den kompletten Aufenthalt, NICHT pro Nacht!\n\nBerechne den Gesamtpreis basierend auf Nutzer-Angabe:\n\nWenn \"X€ pro Nacht\":\n\n- Anzahl Nächte berechnen: checkOut - checkIn\n\n- Gesamtpreis = X€ × Anzahl Nächte\n\n- priceMax = Gesamtpreis\n\nWenn \"X€ gesamt\":\n\n- priceMax = X€ (direkt verwenden)\n\nBeispiele:\n\nUser: \"Wohnung für 30 Tage unter 1800€\"\n\n→ priceMax = 1800\n\nUser: \"Apartment vom 1. bis 8. Dezember maximal 80€ pro Nacht\"\n\nBerechnung: 7 Nächte × 80€ = 560€\n\n→ priceMax = 560\n\nUser: \"Unterkunft für eine Woche, maximal 700€ insgesamt\"\n\n→ priceMax = 700\n\nUser: \"Apartment maximal 100€ pro Nacht für 10 Tage\"\n\n→ priceMax = 1000\n\n=== FLUGSUCHE MIT FALLBACK ===\n\nSCHRITT 1: Location-IDs holen\n\n- search_airport(query=\"Munich\") für Abflugort\n\n- search_airport(query=\"Thessaloniki\") für Zielort\n\nExtrahiere: data[0].id\n\nSCHRITT 2: Intelligente Flugsuche\n\nVersuche in dieser Reihenfolge:\n\n1. search_flights(fromId, toId, departDate, returnDate, stops=\"0\", sort=\"CHEAPEST\")\n\n2. Falls leer: search_flights(fromId, toId, departDate, returnDate, stops=\"1\", sort=\"CHEAPEST\")\n\n3. Falls leer: search_flights(fromId, toId, departDate, returnDate, stops=\"none\", sort=\"BEST\")\n\n=== UNTERKUNFTSSUCHE ===\n\nsearch_airbnb Parameter:\n\n- location: Stadt\n\n- adults: Anzahl Personen\n\n- checkIn: YYYY-MM-DD\n\n- checkOut: YYYY-MM-DD\n\n- priceMax: GESAMTPREIS für kompletten Aufenthalt\n\nBeispiele:\n\n\"Wohnung Thessaloniki für 30 Tage unter 1800€\"\n\n→ search_airbnb(location=\"Thessaloniki\", priceMax=1800)\n\n\"Apartment Berlin 1.-8. Dezember maximal 60€ pro Nacht\"\n\n7 Nächte × 60€ = 420€\n\n→ search_airbnb(location=\"Berlin\", checkIn=\"2025-12-01\", checkOut=\"2025-12-08\", priceMax=420)\n\n\"Unterkunft Paris für eine Woche, 700€ Budget\"\n\n→ search_airbnb(location=\"Paris\", priceMax=700)\n\nWICHTIG: Informiere transparent über Berechnung:\n\n\"Suche Unterkünfte bis 1800€ gesamt (ca. 60€/Nacht für 30 Tage)\"\n\n=== KOMBINIERTE REISEPLANUNG ===\n\nBei \"Plane Reise nach X für Y€\":\n\n1. Flugsuche\n\n2. Verbleibendes Budget: Y€ - Flugpreis\n\n3. search_airbnb(location=X, priceMax=verbleibendes Budget)\n\n=== STADT-NAMEN (für search_airport) ===\n\nMünchen→Munich, Athen→Athens, Köln→Cologne, Prag→Prague,\n\nVenedig→Venice, Rom→Rome, Lissabon→Lisbon, Warschau→Warsaw\n\n=== ANTWORT-FORMAT ===\n\nFlüge:\n\n- Airline, Zeiten, Dauer, Preis, Stops\n\nUnterkünfte:\n\n- Name, Preis (pro Nacht + Gesamtpreis), Bewertung, Link\n\nGesamtkosten:\n\n- Flug + Unterkunft = Total\n\nGerne auch 2-3 alternativen heraussuchen und beim Flug darauf verweisen den Flug mit den Daten auf Booking.com zu suchen!\n\nAntworte auf deutsch oder englisch - je nach dem auf welcher Sprache der Nutzer die Nachricht sendet!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "72d08cec-2d1e-4db7-a4d6-22a690334ce5",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "9be2bd82-82c3-4685-b64e-3118f2d3382f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        288
+      ],
+      "id": "667ea0d4-01e5-475b-bbdc-363e9f87287b",
+      "name": "Simple Memory",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "e5950b53-ed82-4c57-b6ab-4d7da43ec509",
+      "name": "Send a text message",
+      "webhookId": "",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "AIRBNB Rapid API required. https://rapidapi.com/DataCrawler/api/airbnb19\nAuth => Header Auth = x-rapid-apikey\nSeacrhes for AirBnBs",
+        "url": "https://airbnb19.p.rapidapi.com/api/v1/searchPropertyByLocationV2",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "location",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "totalRecords",
+              "value": "10"
+            },
+            {
+              "name": "currency",
+              "value": "EUR"
+            },
+            {
+              "name": "adults",
+              "value": "=1"
+            },
+            {
+              "name": "checkin",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', ``, 'string') }}"
+            },
+            {
+              "name": "checkout",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters5_Value', ``, 'string') }}"
+            },
+            {
+              "name": "priceMax",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters6_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        416
+      ],
+      "id": "7d37c49b-8119-491c-9dc2-52744e5c5372",
+      "name": "search_airbnb",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_RAPIDAPI_CREDENTIAL_ID",
+          "name": "Header Auth account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "https://rapidapi.com/DataCrawler/api/booking-com15\nAPI required => Header auth = x-rapid-apikey",
+        "url": "https://booking-com15.p.rapidapi.com/api/v1/flights/searchFlights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fromId",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "toId",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', ``, 'string') }}"
+            },
+            {
+              "name": "departDate",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', ``, 'string') }}"
+            },
+            {
+              "name": "returnDate",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        240
+      ],
+      "id": "90f807d0-d3a9-4d8b-97d6-faf3dd664230",
+      "name": "search_flights",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_RAPIDAPI_CREDENTIAL_ID",
+          "name": "Header Auth account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "https://rapidapi.com/DataCrawler/api/booking-com15\nAPI REQUIRED! -> Auth = Header Auth - X-Rapid-Apikey\nSearches Airport Codes",
+        "url": "https://booking-com15.p.rapidapi.com/api/v1/flights/searchDestination",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        416
+      ],
+      "id": "98c24467-f24a-435f-aa20-a25b3afc0847",
+      "name": "search_airport",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_RAPIDAPI_CREDENTIAL_ID",
+          "name": "Header Auth account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c2bd190-40d0-4f0d-b8dc-12f3c1406fa4",
+              "name": "chatInput",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "fb97c905-67ed-4bda-8b72-3b32c5900ed5",
+              "name": "sessionId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "df7bcdfb-b9f1-4bfd-a359-5975b2b6ae8f",
+      "name": "GetChatID und Input"
+    }
+  ],
+  "pinData": {
+    "Google Gemini Chat Model": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "GetChatID und Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_airbnb": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_flights": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_airport": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetChatID und Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "31dcd606-97b3-4825-bdf3-0df0e5fb4bf4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "EtSxteGRiEp2BexJ",
+  "tags": []
+}
