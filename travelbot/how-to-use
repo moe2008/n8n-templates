@@ -1,1 +1,200 @@
 
+AI Travel Planning Bot - Setup Guide
+An intelligent Telegram bot that automatically searches for flights and accommodations and plans complete trips using AI.
+
+Features
+
+Flight Search with automatic fallback strategy (direct flights → 1 stop → all flights)
+Airbnb Accommodation Search with intelligent price calculation
+Complete Trip Planning (flights + accommodation + budget breakdown)
+Multilingual (responds in German or English based on input language)
+Smart Date Parsing (understands "in November", "for one week", etc.)
+
+
+Prerequisites
+You'll need free accounts for:
+
+Telegram - for the bot interface
+Google Gemini - for AI capabilities
+RapidAPI - for flight and accommodation search
+N8N - workflow automation platform
+
+
+Step-by-Step Setup
+1. Create Telegram Bot
+
+Open Telegram and search for @BotFather
+Send /newbot
+Choose a name (e.g., "Travel Planner Bot")
+Choose a username (e.g., "my_travel_planner_bot")
+Save the API Token - you'll need it later!
+
+2. Get Google Gemini API Key
+
+Go to https://makersuite.google.com/app/apikey
+Click "Create API Key"
+Save the API Key
+
+3. Setup RapidAPI Account
+
+Register at https://rapidapi.com
+Subscribe to these APIs (all have free tiers):
+
+Airbnb API: https://rapidapi.com/DataCrawler/api/airbnb19
+Booking.com Flights API: https://rapidapi.com/DataCrawler/api/booking-com15
+
+
+Copy your RapidAPI Key from the dashboard
+
+4. Install N8N
+Option A: N8N Cloud (easiest)
+
+Go to https://n8n.io
+Sign up for a free account
+Create a new workflow instance
+
+Option B: Self-hosted (advanced users)
+bashnpx n8n
+5. Import Workflow
+
+Open N8N
+Click "+" (new workflow)
+Click the 3 dots in the top right
+Select "Import from File"
+Upload the ai-travel-planner.json file
+
+6. Configure Credentials
+A) Telegram Credential
+
+Go to Settings → Credentials
+Click "Add Credential"
+Search for "Telegram"
+Enter your Bot Token
+Save as "Telegram Bot"
+
+B) Google Gemini Credential
+
+Add Credential → "Google PaLM API" (used for Gemini)
+Enter your Gemini API Key
+Save as "Google Gemini API"
+
+C) RapidAPI Credentials (create 2)
+For Airbnb:
+
+Add Credential → "Header Auth"
+Header Name: x-rapidapi-key
+Header Value: YOUR_RAPIDAPI_KEY
+Save as "RapidAPI Airbnb"
+
+For Booking.com:
+
+Add Credential → "Header Auth"
+Header Name: x-rapidapi-key
+Header Value: YOUR_RAPIDAPI_KEY (same key!)
+Save as "RapidAPI Booking"
+
+7. Assign Credentials to Nodes
+Open each node in the workflow and select the corresponding credential:
+
+Telegram Trigger → Select "Telegram Bot"
+Send a text message → Select "Telegram Bot"
+Google Gemini Chat Model → Select "Google Gemini API"
+search_airbnb → Select "RapidAPI Airbnb"
+search_flights → Select "RapidAPI Booking"
+search_airport → Select "RapidAPI Booking"
+
+8. Activate Workflow
+
+Click "Inactive" → "Active" in the top right
+Your bot is now live!
+
+
+Testing the Bot
+Open your bot in Telegram and try:
+Flight from Munich to Thessaloniki on November 15
+Apartment in Berlin for one week under 700€
+Plan me a trip to Barcelona for 1500€
+
+Example Queries
+Flights only:
+
+"Flight from Hamburg to Athens on December 20"
+"Direct flight Berlin to Rome next month"
+
+Accommodations only:
+
+"Apartment Thessaloniki 30 days 1800€"
+"Apartment Paris max 80€ per night"
+
+Complete trip:
+
+"Plan trip to Lisbon for 1000€"
+"I want to go to Barcelona for one week, budget 1500€"
+
+
+Free Tier Limits
+
+Google Gemini: 60 requests/minute - free
+RapidAPI Airbnb: 500 requests/month - free
+RapidAPI Booking: 100 requests/month - free
+N8N Cloud: 5,000 workflow executions/month - free
+
+
+Troubleshooting
+Bot doesn't respond:
+
+Check if workflow is "Active"
+Verify Telegram credential is configured
+
+No flights found:
+
+Try a different route (e.g., Munich instead of Hamburg)
+Check RapidAPI credits
+
+Airbnb errors:
+
+Verify priceMax is realistic (not too low)
+Check date format (YYYY-MM-DD)
+
+API errors:
+
+Go to rapidapi.com → Dashboard
+Check remaining credits
+Consider upgrading to paid plan if needed
+
+
+Optional Extensions
+Extend the bot with:
+
+Restaurant search (Yelp API)
+Activities (GetYourGuide API)
+Weather forecast (OpenWeather API)
+PDF export of travel plans
+
+
+Support
+For questions:
+
+N8N Community: https://community.n8n.io
+Telegram Bot API: https://core.telegram.org/bots
+RapidAPI Support: https://rapidapi.com/support
+
+
+Architecture
+Telegram Message
+    ↓
+Parse Input (chatId + text)
+    ↓
+AI Agent (Google Gemini)
+    ├─→ search_airport (get airport codes)
+    ├─→ search_flights (find flights)
+    └─→ search_airbnb (find accommodations)
+    ↓
+Format Response
+    ↓
+Send to Telegram
+
+License
+This workflow is provided as-is for personal and commercial use.
+
+Happy travel planning!
